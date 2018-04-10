@@ -70,7 +70,6 @@ function plot_euler_explicite(Y,h)
     xs2jpg(0,'foo.jpg',1);
 endfunction
 
-Y = [0,0,1,0]
-u = rhs(Y)
+
 Test = eulerexp(Y,4,40)
 plot_euler_explicite(Test,1e-1)
