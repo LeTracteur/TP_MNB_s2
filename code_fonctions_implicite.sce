@@ -9,12 +9,12 @@ function [res]=feulerimp(y)
     res = M*(y - 2*x_0 + x_m1)-(h.^2)*f
 endfunction
 //fonction qui calcul H(i)
-function res1 = calcul_h(x_2,x_1,M,n)
+function res1 = calcul_h(x_2,x_1,M,n,h)
     res1 = 0
     for i = 1:n-1
-        res1 = res1 + (1/2)*M(i,i)*(x_2(i)-x_1(i)).^2 + (2/5)*max(0,(x_2(i)-x_2(i+1))).^(5/2)
+        res1 = res1 + (1/2)*M(i,i)*((x_2(i)-x_1(i))/h).^2 + (2/5)*max(0,(x_2(i)-x_2(i+1))).^(5/2)
     end
-    res1 = res1 + (1/2)*M(n,n)*(x_2(n)-x_1(n)).^2
+    res1 = res1 + (1/2)*M(n,n)*((x_2(n)-x_1(n))/h).^2
 endfunction
 
 function [H,vitesse,forces] = implicite(h,n,T,m)
@@ -36,28 +36,28 @@ function [H,vitesse,forces] = implicite(h,n,T,m)
     x_kp1 = ones(n,1)
     for i = 1:N
         x_kp1 = fsolve(x_0,feulerimp)
-        H(i) = calcul_h(x_0,x_m1,M,n);
-        vitesse(1,i) = (x_0(1)-x_m1(1))/2;
-        vitesse(2,i) = (x_0(7)-x_m1(7))/2;
-        vitesse(3,i) = (x_0(11)-x_m1(11))/2;
-        vitesse(4,i) = (x_0(15)-x_m1(15))/2;
-        vitesse(5,i) = (x_0(19)-x_m1(19))/2;
-        vitesse(6,i) = (x_0(20)-x_m1(20))/2;
-        vitesse(7,i) = (x_0(21)-x_m1(21))/2;
+        H(i) = calcul_h(x_0,x_m1,M,n,h);
+        vitesse(1,i) = (x_0(1)-x_m1(1))/h;
+        vitesse(2,i) = (x_0(7)-x_m1(7))/h;
+        vitesse(3,i) = (x_0(11)-x_m1(11))/h;
+        vitesse(4,i) = (x_0(15)-x_m1(15))/h;
+        vitesse(5,i) = (x_0(19)-x_m1(19))/h;
+        vitesse(6,i) = (x_0(20)-x_m1(20))/h;
+        vitesse(7,i) = (x_0(21)-x_m1(21))/h;
         for j = 1:(n-1)
             forces(j,i) = max(0,(x_0(j)-x_0(j+1))).^(3/2)
         end
         x_m1 = x_0
         x_0 = x_kp1
     end
-    H(N+1) = calcul_h(x_0,x_m1,M,n)
-    vitesse(1,N+1) = (x_0(1)-x_m1(1))/2;
-    vitesse(2,N+1) = (x_0(7)-x_m1(7))/2;
-    vitesse(3,N+1) = (x_0(11)-x_m1(11))/2;
-    vitesse(4,N+1) = (x_0(15)-x_m1(15))/2;
-    vitesse(5,N+1) = (x_0(19)-x_m1(19))/2;
-    vitesse(6,N+1) = (x_0(20)-x_m1(20))/2;
-    vitesse(7,N+1) = (x_0(21)-x_m1(21))/2;
+    H(N+1) = calcul_h(x_0,x_m1,M,n,h)
+    vitesse(1,N+1) = (x_0(1)-x_m1(1))/h;
+    vitesse(2,N+1) = (x_0(7)-x_m1(7))/h;
+    vitesse(3,N+1) = (x_0(11)-x_m1(11))/h;
+    vitesse(4,N+1) = (x_0(15)-x_m1(15))/h;
+    vitesse(5,N+1) = (x_0(19)-x_m1(19))/h;
+    vitesse(6,N+1) = (x_0(20)-x_m1(20))/h;
+    vitesse(7,N+1) = (x_0(21)-x_m1(21))/h;
 endfunction
 
 function plot_H(H,H1,h)
@@ -74,8 +74,8 @@ function plot_H(H,H1,h)
     type(a.title)
     a.x_label
     a.y_label
-    xtitle("Evolution de l énergie mecanique en fonction du temps, h=0.001", "temps","H(t)")
-    xs2jpg(0,'energie_meca_h=0.001.jpg',1);
+    xtitle("Evolution de l énergie mecanique en fonction du temps, h=0.1", "temps","H(t)")
+    xs2jpg(0,'energie_meca_h=0.1.jpg',1);
 endfunction
 
 function plot_vitesses(v,h,m)
@@ -120,7 +120,7 @@ stacksize(10^8)
 global n
 n = 21
 T = 60
-h = 1e-3
+h = 1e-1
 
 //definition des variables x^(k)et x^(k-1)
 global x_0
@@ -132,13 +132,13 @@ x_m1(1) = -h
 //appel des fonctiosn
 
 [H,vit,force] = implicite(h,n,T,0.5)
-plot_impacts(force,h,0.5)
-plot_vitesses(vit,h,0.5)
+//plot_impacts(force,h,0.5)
+//plot_vitesses(vit,h,0.5)
 x_0 = zeros(n,1)
 x_m1 = zeros(n,1)
 x_m1(1) = -h
 
 [H1,vit,force] = implicite(h,n,T,1)
-plot_vitesses(vit,h,1)
+//plot_vitesses(vit,h,1)
 plot_H(H,H1,h)
-plot_impacts(force,h,1)
+//plot_impacts(force,h,1)

@@ -25,12 +25,12 @@ function implicite(h,n,T)
         end
         M = diag(diago)
         x_kp1 = ones(n,1)
-        for i = 1:(N-1)
+        for i = 1:N
             x_kp1 = fsolve(x_0,feulerimp)
             x_m1 = x_0
             x_0 = x_kp1
         end
-        vitesse(j) = (x_0(21)-x_m1(21))/2;
+        vitesse(j) = (x_0(21)-x_m1(21))/h;
     end
     clf()
     plot([0.1:1e-2:1],vitesse)
@@ -40,7 +40,7 @@ function implicite(h,n,T)
     a.x_label
     a.y_label
     xtitle('Evolution de la vitesse d éjection pour m allant de 0.1 à 1', "m","$v_{21}(60)$")
-    xs2jpg(0,'ejection.jpg',1);
+    xs2jpg(0,'ejection_autre.jpg',1);
 endfunction
 n = 21
 T = 60
