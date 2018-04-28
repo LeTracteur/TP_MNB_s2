@@ -79,19 +79,20 @@ endfunction
 
 function plot_w()
     T=95
-    h=5e-3
+    h=1e-1
     m=0.6
     n=31
-    temps = [1.2:0.001:2.4]
-    ew = zeros(1,1201)
+    
+    ew = zeros(1,13)
     i=0
-    for w = [1.2:0.001:2.4]
+    for w = [1.2:0.1:2.4]
         i = i+1
         vitesse = resolution(T,h,n,m,w)
-        ew(i) = max(vitesse(2,:))/max(vitesse(1,:))
+        ew(i) = max(abs(vitesse(2,:)))/max(abs(vitesse(1,:)))
     end
     clf()
-    plot(temps,ew,'+')
+    w = [1.2:0.1:2.4]
+    plot(w,ew,'+')
     a=get("current_axes");
     a.title
     type(a.title)

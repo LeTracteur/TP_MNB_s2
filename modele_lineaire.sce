@@ -1,9 +1,8 @@
+//question 15
 function [linf1,ldiag]=factorise(diago, sous_diag,n)
-  //  longueur_diag = size(diago)
-  //  n = longueur_diag(2)
     ldiag = zeros(1,n)
     linf1 = zeros(1,n-1)
-    //remplissage du vecteur diagonal de L
+    //calcul des élements de la diagonale et de la sous diagonale
     ldiag(1) = sqrt(diago(1))
     linf1(1) = sous_diag(1)/ldiag(1)
     for i = 2:(n-1)
@@ -13,9 +12,8 @@ function [linf1,ldiag]=factorise(diago, sous_diag,n)
     ldiag(n) = sqrt(diago(n)-linf1(n-1).^2)
 endfunction
 
+//question 16-17
 function y = descente(linf1,ldiag,b,n)
-  //  longueur_diag = size(ldiag)
-  //  n = longueur_diag(2)
     y = zeros(1,n)
     y(1) = b(1)/ldiag(1)
     for i =2:n
@@ -23,9 +21,8 @@ function y = descente(linf1,ldiag,b,n)
     end
 endfunction
 
+//question 16-17
 function u = remonte(linf1,ldiag,y,n)
- //   longueur_diag = size(ldiag)
- //   n = longueur_diag(2)
     u = zeros(1,n)
     u(n) = y(n)/ldiag(n)
     for i =(n-1):-1:1
@@ -33,13 +30,14 @@ function u = remonte(linf1,ldiag,y,n)
     end
 endfunction
 
+//question 18
 function [vitesse,vitesseT4] = resolution(T,h,n,m)
     //definition des parametres initiaux
     u_0 = zeros(1,n)
     u_m1 = zeros(1,n)
     //nb d'iteration
     N = T/h
-    p=65
+    //vecteur contenant les valeurs des vitesses 1, 8, 32, 48, 63
     vitesse = zeros(5,N+1);
     //creation de M
     diago_m = ones(1,n)
@@ -58,8 +56,8 @@ function [vitesse,vitesseT4] = resolution(T,h,n,m)
     end
     //calcul de la facto de cholesky
     [linf1,ldiag]= factorise(diago, sous_diag)
-
     for k = 0:N
+        //calcul de la veleur de f1(t)
         t = (k+1)*h
         if t >=0 & t<=0.5 then
             f1 = t
@@ -75,6 +73,7 @@ function [vitesse,vitesseT4] = resolution(T,h,n,m)
             bk(j) = 2*M(j,j)*u_0(j) - M(j,j)*u_m1(j)
         end
         if t == T/4 then
+            //vecteur des vitesses à l'instant t = T/4
             vitesseT4 = ones(1,n) 
             for u = 1:n
                 vitesseT4(u)= (u_0(u)-u_m1(u))/h
@@ -90,11 +89,6 @@ function [vitesse,vitesseT4] = resolution(T,h,n,m)
         u_m1 = u_0;
         u_0 = ukp1;
     end
-    //vitesse(1,N+1) = (u_0(1)-u_m1(1))/h;
-    //vitesse(2,N+1) = (u_0(8)-u_m1(8))/h;
-    //vitesse(3,N+1) = (u_0(32)-u_m1(32))/h;
-    //vitesse(4,N+1) = (u_0(48)-u_m1(48))/h;
-    //vitesse(5,N+1) = (u_0(63)-u_m1(63))/h;
 endfunction
 
 function energie = cinetique(T,h,n)
@@ -104,10 +98,22 @@ function energie = cinetique(T,h,n)
     //nb d'iteration
     N = T/h
     p=65
-    energie = zeros(2077,63)
+    energie = zeros(N/p,63)
     
+    diago_m = ones(1,n)
+    for i = 1:n
+        if modulo(i,2) == 0 then
+            diago_m(i)=m
+        end,
+    end
+    M = diag(diago_m)
     
-
+    sous_diag = (-h^2)*ones(1,n-1)
+    diago = zeros(1,n)
+    diago(1) = M(1,1) + h^2
+    for i1 = 2:n
+        diago(i1)=M(i1,i1)+2*h^2
+    end
     //calcul de la facto de cholesky
     [linf1,ldiag]= factorise(diago, sous_diag,n)
     for k = 1:N
@@ -127,7 +133,7 @@ function energie = cinetique(T,h,n)
         end
         if modulo(k,p) == 0 then
             for l = 1:63
-                kp = k/65
+                kp = k/p
                 energie(kp,l) = 0.5*M(l,l)*((u_0(l)-u_m1(l))/h).^2
             end
         end
@@ -137,7 +143,7 @@ function energie = cinetique(T,h,n)
         u_0 = ukp1;
     end
     for l = 1:63
-        energie(2077,l) = 0.5*M(l,l)*((u_0(l)-u_m1(l))/h).^2
+        energie(N/p+1,l) = 0.5*M(l,l)*((u_0(l)-u_m1(l))/h).^2
     end
 endfunction
 
@@ -179,18 +185,6 @@ endfunction
 function plot_cine(energie,h)
     xi = [1:63]
     temps = [0:65*h:135]
-  //  for i = 0:2076
-    //    temps(i+1) = h*i*65;
-   // end
-    //R = zeros(2077,63)
-    //for k = 1:2077
-      //  for l = 1:63
-        //    R(k,l) = energie(k*65,l)
-         //end
-    //end
-    //for l = 1:63
-      //  R(2077,l) = energie(135001,l)
-    //end
     clf()
     Sgrayplot(temps,xi,energie)
     a=get("current_axes");
@@ -198,7 +192,7 @@ function plot_cine(energie,h)
     type(a.title)
     a.x_label
     a.y_label
-    xtitle("Evolution de l energie cinetique pour h=0.001", "temps","i")
+    xtitle("Evolution de l energie cinetique pour h=0.001, p=60", "temps","i")
     xs2jpg(0,'energie_h=0.001.jpg',1);
 endfunction
 
@@ -217,7 +211,7 @@ n=63
 m=1
 
 
-[vit,vitT4] = resolution(T,h,n,m);
+//[vit,vitT4] = resolution(T,h,n,m);
 
 //plot_vit(vitT4,h,m);
 //plot_vitesses1(vit,h,m);

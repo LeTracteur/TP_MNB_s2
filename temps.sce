@@ -13,19 +13,21 @@ endfunction
 function implicite(h,n,T)
     N= T/h
     vitesse = ones(1,91)
-    //boucle de calcule de x^(k+1)
     j = 0
     for m = 0.1:1e-2:1
         j = j+1
+        //calcul de la nouvelle matrice M
         diago = ones(1,n)
         for i = 1:n
             if modulo(i,2) == 0 then
                 diago(i)=m
-            end,
+            end
         end
+        global M
         M = diag(diago)
+        disp(M)
         x_kp1 = ones(n,1)
-        for i = 1:N
+        for k = 1:N
             x_kp1 = fsolve(x_0,feulerimp)
             x_m1 = x_0
             x_0 = x_kp1
@@ -33,7 +35,7 @@ function implicite(h,n,T)
         vitesse(j) = (x_0(21)-x_m1(21))/h;
     end
     clf()
-    plot([0.1:1e-2:1],vitesse)
+    plot([0.1:1e-2:1],vitesse, '+')
     a=get("current_axes");
     a.title
     type(a.title)
