@@ -130,7 +130,7 @@ endfunction
 //modification de la taille de la pile pour eviter des soucis de mémoire
 stacksize(268435454)
 //definition des paramtetres initaux
-T = 180
+T = 135
 h = 1e-3
 n=63
 m=1
