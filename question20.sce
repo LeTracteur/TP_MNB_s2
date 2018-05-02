@@ -1,7 +1,4 @@
-
 function [linf1,ldiag]=factorise(diago, sous_diag,n)
-  //  longueur_diag = size(diago)
-  //  n = longueur_diag(2)
     ldiag = zeros(1,n)
     linf1 = zeros(1,n-1)
     //remplissage du vecteur diagonal de L
@@ -15,8 +12,6 @@ function [linf1,ldiag]=factorise(diago, sous_diag,n)
 endfunction
 
 function y = descente(linf1,ldiag,b,n)
-  //  longueur_diag = size(ldiag)
-  //  n = longueur_diag(2)
     y = zeros(1,n)
     y(1) = b(1)/ldiag(1)
     for i =2:n
@@ -25,8 +20,6 @@ function y = descente(linf1,ldiag,b,n)
 endfunction
 
 function u = remonte(linf1,ldiag,y,n)
- //   longueur_diag = size(ldiag)
- //   n = longueur_diag(2)
     u = zeros(1,n)
     u(n) = y(n)/ldiag(n)
     for i =(n-1):-1:1
@@ -76,22 +69,24 @@ function [vitesse] = resolution(T,h,n,m,w)
         u_0 = ukp1;
     end
 endfunction
-
-function plot_w()
+//fonction traçant la courbe d'évolution du rapport du max de la vitesse finale
+//sur le max de la vitesse initale
+//On rentre en parametre le pas "s'échantillonnage de w"
+function plot_w(pas)
     T=95
-    h=1e-1
+    h=5e-3
     m=0.6
     n=31
     
-    ew = zeros(1,13)
+    ew = zeros(1.2:pas:2.4)
     i=0
-    for w = [1.2:0.1:2.4]
+    for w = [1.2:pas:2.4]
         i = i+1
         vitesse = resolution(T,h,n,m,w)
-        ew(i) = max(abs(vitesse(2,:)))/max(abs(vitesse(1,:)))
+        ew(i) = max(vitesse(2,:))/max(vitesse(1,:))
     end
     clf()
-    w = [1.2:0.1:2.4]
+    w = [1.2:pas:2.4]
     plot(w,ew,'+')
     a=get("current_axes");
     a.title
@@ -100,4 +95,5 @@ function plot_w()
     a.y_label
     xtitle("Evolution de e(w) en fonction de w", "w","$e(w)$")
 endfunction
-plot_w()
+//attention le pas choisit est un peu élévé ce qui rend le temps de calcul un peu long
+plot_w(0.01)

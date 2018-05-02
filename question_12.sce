@@ -28,7 +28,7 @@ function vitesse = implicite(h,n,T,m)
     end
     vitesse = (x_0(21)-x_m1(21))/h;
 endfunction
-
+//fonction tracant la courbe correspondant à la vitesse d'éjection de la derniere bille en fonction de m
 function plot_m(m,vitesse_f)
     clf()
     plot(m,vitesse_f, '+')
@@ -41,8 +41,12 @@ function plot_m(m,vitesse_f)
     xs2jpg(0,'test_ejection.jpg',1);
 endfunction
 
-
+//fonction calculant la vitesse d'éjection de la dernière bille
+//prend en paramtre le pas "échantillonnage de m"
+//reoturne le vecteur contenant tout les vitesses finales et le vecteur contenant
+//tout les m pour les quels la vitesse a été calculé
 function [vitesse_f,m_v] = ejection(pas)
+    //définition des variables de l'énoncé
     n = 21
     T = 60
     h = 1e-2
@@ -51,6 +55,7 @@ function [vitesse_f,m_v] = ejection(pas)
     global x_m1
     x_m1 = zeros(n,1)
     x_m1(1) = -h
+    //création du vecteur qui va contenir les vitesses finales de la derniere bille
     vitesse_f = zeros(0.1:pas:1)
     m_v = [0.1:pas:1]
     compteur = 0

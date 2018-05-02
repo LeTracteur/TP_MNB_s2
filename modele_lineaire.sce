@@ -47,7 +47,7 @@ function [vitesse,vitesseT4] = resolution(T,h,n,m)
         end,
     end
     M = diag(diago_m)
-    
+    //définition de la diagonale de A et de sa sous diagonale
     sous_diag = (-h^2)*ones(1,n-1)
     diago = zeros(1,n)
     diago(1) = M(1,1) + h^2
@@ -79,6 +79,8 @@ function [vitesse,vitesseT4] = resolution(T,h,n,m)
                 vitesseT4(u)= (u_0(u)-u_m1(u))/h
             end
         end
+        //on remplit le vecteur des vitesses avec les vitesses à l'instant k
+        // pour la question 19
         vitesse(1,k+1) = (u_0(1)-u_m1(1))/h;
         vitesse(2,k+1) = (u_0(8)-u_m1(8))/h;
         vitesse(3,k+1) = (u_0(32)-u_m1(32))/h;
@@ -91,68 +93,10 @@ function [vitesse,vitesseT4] = resolution(T,h,n,m)
     end
 endfunction
 
-function energie = cinetique(T,h,n)
-    //definition des parametres initiaux
-    u_0 = zeros(1,n)
-    u_m1 = zeros(1,n)
-    //nb d'iteration
+//question 19
+//fonction traçant les graphes des vitesses 1, 8, 32, 48, 63
+function plot_vitesses1(v,h,m,T)
     N = T/h
-    p=65
-    energie = zeros(N/p,63)
-    
-    diago_m = ones(1,n)
-    for i = 1:n
-        if modulo(i,2) == 0 then
-            diago_m(i)=m
-        end,
-    end
-    M = diag(diago_m)
-    
-    sous_diag = (-h^2)*ones(1,n-1)
-    diago = zeros(1,n)
-    diago(1) = M(1,1) + h^2
-    for i1 = 2:n
-        diago(i1)=M(i1,i1)+2*h^2
-    end
-    //calcul de la facto de cholesky
-    [linf1,ldiag]= factorise(diago, sous_diag,n)
-    for k = 1:N
-        t = k*h
-        if t >=0 & t<=0.5 then
-            f1 = t
-        elseif t>0.5 & t<=1 then
-            f1 = 1 -t
-        else
-            f1 =0
-        end
-        //creation du vecteur b^k
-        bk = zeros(1,n)
-        bk(1) = 2*M(1,1)*u_0(1) - M(1,1)*u_m1(1) + (h^2)*f1
-        for j = 2:n
-            bk(j) = 2*M(j,j)*u_0(j) - M(j,j)*u_m1(j)
-        end
-        if modulo(k,p) == 0 then
-            for l = 1:63
-                kp = k/p
-                energie(kp,l) = 0.5*M(l,l)*((u_0(l)-u_m1(l))/h).^2
-            end
-        end
-        yk = descente(linf1,ldiag,bk,n);
-        ukp1 = remonte(linf1,ldiag,yk,n);
-        u_m1 = u_0;
-        u_0 = ukp1;
-    end
-    for l = 1:63
-        energie(N/p+1,l) = 0.5*M(l,l)*((u_0(l)-u_m1(l))/h).^2
-    end
-endfunction
-
-
-
-
-
-function plot_vitesses1(v,h,m)
-    N = 135/h
     temps = ones(1,N+1);
     for i = 0:N
         temps(i+1) = h*i;
@@ -169,52 +113,31 @@ function plot_vitesses1(v,h,m)
     xs2jpg(0,'modele lineaire vitesse_h=0.001.jpg',1);
 endfunction
 
+//fonction traçant les graphes des vitesses pour t = T/4
 function plot_vit(v,h,m)
     x=[1:63]
     clf()
-    plot(x,v, '+')
+    plot(x,v)
     a=get("current_axes");
     a.title
     type(a.title)
     a.x_label
     a.y_label
-    xtitle("Vitesse Vi au temps t=T/4", "temps","v(t)")
-    xs2jpg(0,'modele lineaire.jpg',1);
+    xtitle("Vitesse Vi au temps t=T/4", "billes","v(t)")
+    xs2jpg(0,'vitesse_T4.jpg',1);
 endfunction
 
-function plot_cine(energie,h)
-    xi = [1:63]
-    temps = [0:65*h:135]
-    clf()
-    Sgrayplot(temps,xi,energie)
-    a=get("current_axes");
-    a.title
-    type(a.title)
-    a.x_label
-    a.y_label
-    xtitle("Evolution de l energie cinetique pour h=0.001, p=60", "temps","i")
-    xs2jpg(0,'energie_h=0.001.jpg',1);
-endfunction
-
-//exemple pour voir si ça marche bien ou pas
-//Ad = [1,2,2,2,2]
-//Asd = [-1,-1,-1,-1]
-//[Lsd,Ld] = factorise(Ad,Asd)
-//b = [1,2,3,4,5]
-//y1 = descente(Lsd,Ld,b)
-//u1 = remonte(Lsd,Ld,y1)
-
+//modification de la taille de la pile pour eviter des soucis de mémoire
 stacksize(268435454)
-T = 135
+//definition des paramtetres initaux
+T = 180
 h = 1e-3
 n=63
 m=1
 
+//appels des fonctions
+[vit,vitT4] = resolution(T,h,n,m);
+plot_vit(vitT4,h,m);
+plot_vitesses1(vit,h,m,T);
 
-//[vit,vitT4] = resolution(T,h,n,m);
-
-//plot_vit(vitT4,h,m);
-//plot_vitesses1(vit,h,m);
-energie=cinetique(T,h,n)
-plot_cine(energie,h);
 

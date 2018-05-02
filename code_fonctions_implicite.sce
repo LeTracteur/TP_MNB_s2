@@ -43,7 +43,7 @@ function [H,vitesse,forces] = implicite(h,n,T,m)
         x_kp1 = fsolve(x_0,feulerimp)
         //calcul de H au different temps i pour la question 9
         H(i) = calcul_h(x_0,x_m1,M,n,h);
-        //remplit les vecteurs vitesses pour la question 10
+        //remplit les vecteurs vitesses pour la question 10 et 11
         vitesse(1,i) = (x_0(1)-x_m1(1))/h;
         vitesse(2,i) = (x_0(7)-x_m1(7))/h;
         vitesse(3,i) = (x_0(11)-x_m1(11))/h;
@@ -51,14 +51,14 @@ function [H,vitesse,forces] = implicite(h,n,T,m)
         vitesse(5,i) = (x_0(19)-x_m1(19))/h;
         vitesse(6,i) = (x_0(20)-x_m1(20))/h;
         vitesse(7,i) = (x_0(21)-x_m1(21))/h;
-        //calcul des forces de contacts pour la question 10
+        //calcul des forces de contacts pour la question 10 et 11
         for j = 1:(n-1)
             forces(j,i) = max(0,(x_0(j)-x_0(j+1))).^(3/2)
         end
         x_m1 = x_0
         x_0 = x_kp1
     end
-    //on remplit les vecteurs pour la dernières iterations
+    //on remplit les vecteurs pour la dernière iteration
     H(N+1) = calcul_h(x_0,x_m1,M,n,h)
     vitesse(1,N+1) = (x_0(1)-x_m1(1))/h;
     vitesse(2,N+1) = (x_0(7)-x_m1(7))/h;
@@ -73,6 +73,7 @@ endfunction
 function [vit,vit1,force,force1] = plot_H(h,T)
     N = T/h;
     [H,vit,force] = implicite(h,n,T,0.5)
+    //On remet à l'état initial les variables x^(0) et x^(-1) pour calcul H avec m =1
     x_0 = zeros(n,1);
     x_m1 = zeros(n,1);
     x_m1(1) = -h
@@ -137,6 +138,7 @@ x_m1 = zeros(n,1);
 for i = 1:3 //boucle pour les differentes valeurs de h
     x_m1(1) = -h(i);
     [vit,vit1,force,force1] = plot_H(h(i),T);
+    //question 10-11
     if (i == 3) then
         plot_vitesses(vit,h(i),0.5,T);
         plot_vitesses(vit1,h(i),1,T);
